@@ -1,0 +1,66 @@
+def is_safe(board, row, col, n):
+    # Check this row on the left side
+    for i in range(col):
+        if board[row][i] == 1:
+            return False
+
+    # Check the upper diagonal on the left side
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Check the lower diagonal on the left side
+    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    return True
+
+def solve_n_queens_util(board, col, n, path):
+    # If all queens are placed
+    if col >= n:
+        return True
+
+    for i in range(n):
+        if is_safe(board, i, col, n):
+            # Place this queen in board[i][col]
+            board[i][col] = 1
+            path.append((i, col))  # Record the path
+
+            # Recur to place the rest of the queens
+            if solve_n_queens_util(board, col + 1, n, path):
+                return True
+
+            # If placing queen in board[i][col] doesn't lead to a solution,
+            # then remove the queen from board[i][col]
+            board[i][col] = 0
+            path.pop()  # Remove from the path since we are backtracking
+
+    # If the queen cannot be placed in any row in this column col, then return False
+    return False
+
+def solve_n_queens(n):
+    # Initialize the board with zeros
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    path = []
+
+    if not solve_n_queens_util(board, 0, n, path):
+        print("Solution does not exist")
+        return False
+
+    # Print the solution
+    print("\nFinal Board with Queens placed (Q):")
+    for row in board:
+        print(" ".join(["Q" if x == 1 else "." for x in row]))
+
+    # Print the path
+    print("\nPath taken (row, column):")
+    for step in path:
+        print(f"Queen placed at Row {step[0] + 1}, Column {step[1] + 1}")
+   
+    return True
+
+# Input the number of queens
+n = int(input("Enter the number of queens: "))
+
+solve_n_queens(n)

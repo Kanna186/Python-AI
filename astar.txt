@@ -1,0 +1,60 @@
+import heapq
+class Node:
+    def __init__(self, name, cost=0, heuristic=0):
+        self.name = name
+        self.cost = cost  # g(n)
+        self.heuristic = heuristic  # h(n)
+        self.f = cost + heuristic  # f(n) = g(n) + h(n)
+    def __lt__(self, other):
+        return self.f < other.f
+def a_star_search(start, goal, graph, heuristics):
+    open_set = []
+    closed_set = set()
+    start_node = Node(start, 0, heuristics[start])
+    heapq.heappush(open_set, start_node)
+    came_from = {}
+    while open_set:
+        current_node = heapq.heappop(open_set)
+        if current_node.name == goal:
+            return reconstruct_path(came_from, current_node)
+        closed_set.add(current_node.name)
+        for neighbor, cost in graph[current_node.name].items():
+            if neighbor in closed_set:
+                continue
+            tentative_cost = current_node.cost + cost
+            neighbor_node = Node(neighbor, tentative_cost, heuristics[neighbor])
+            if not any(n.name == neighbor and n.cost <= tentative_cost for n in open_set):
+                came_from[neighbor] = current_node.name
+                heapq.heappush(open_set, neighbor_node)
+    return None
+def reconstruct_path(came_from, current_node):
+    total_path = [current_node.name]
+    while current_node.name in came_from:
+        current_node = Node(came_from[current_node.name])
+        total_path.append(current_node.name)
+    return total_path[::-1]
+def main():
+    # Input the graph from the user
+    graph = {}
+    num_nodes = int(input("Enter the number of nodes in the graph: "))
+    for _ in range(num_nodes):
+        node = input("Enter node name: ")
+        neighbors = input(f"Enter neighbors for {node} (format: neighbor1:cost, neighbor2:cost): ")
+        graph[node] = {}
+        for neighbor in neighbors.split(','):
+            neighbor_name, cost = neighbor.split(':')
+            graph[node][neighbor_name.strip()] = int(cost.strip())
+    # Input heuristics from the user
+    heuristics = {}
+    for node in graph.keys():
+        heuristic_value = int(input(f"Enter heuristic value for {node}: "))
+        heuristics[node] = heuristic_value
+    start = input("Enter the start node: ")
+    goal = input("Enter the goal node: ")
+    path = a_star_search(start, goal, graph, heuristics)
+    if path:
+        print("Path found:", " -> ".join(path))
+    else:
+        print("No path found.")
+if __name__ == "__main__":
+    main()

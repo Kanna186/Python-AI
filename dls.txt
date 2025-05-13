@@ -1,0 +1,43 @@
+class Graph:
+    def __init__(self):
+        self.graph = {}
+    def add_edge(self, u, v):
+        if u in self.graph:
+            self.graph[u].append(v)
+        else:
+            self.graph[u] = [v]
+    def dls(self, node, goal, depth, path):
+        path.append(node)
+        if depth == 0:
+            if node == goal:
+                return True, path
+            else:
+                path.pop()
+                return False, path
+        if node not in self.graph:
+            path.pop()
+            return False, path
+        for neighbor in self.graph[node]:
+            found, result_path = self.dls(neighbor, goal, depth - 1, path)
+            if found:
+                return True, result_path
+        path.pop()
+        return False, path
+def main():
+    g = Graph()
+    edges = int(input("Enter the number of edges: "))
+    for _ in range(edges):
+        u, v = input("Enter edge (u v): ").split()
+        g.add_edge(u, v)
+    start = input("Enter the start node: ")
+    goal = input("Enter the goal node: ")
+    depth_limit = int(input("Enter the depth limit: "))
+    found, path = g.dls(start, goal, depth_limit, [])
+    if found:
+        print(f"Goal node {goal} is reachable from start node {start} within depth limit {depth_limit}.")
+        print("Path:", " -> ".join(path))
+    else:
+        print(f"Goal node {goal} is NOT reachable from start node {start} within depth limit {depth_limit}.")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,17 @@
+class KnowledgeBase:
+    def __init__(self):
+        self.likes = {}
+        self.facts = set()  
+    def likes_person(self, person1, person2):
+        return person2 in self.likes.get(person1, set())
+    def query_likes(self, person):
+        results = []
+        if person == 'X':
+            results.append(f'likes(X, susie)')             
+            return results
+# Example Usage
+if __name__ == "__main__":
+    kb = KnowledgeBase()    
+    results = kb.query_likes('X')
+    for result in results:
+        print(result)

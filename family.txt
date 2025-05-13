@@ -1,0 +1,68 @@
+from collections import defaultdict
+class Solution:
+    def __init__(self, head_name):
+        self.family = defaultdict(list)
+        self.relationships = defaultdict(lambda: {'father': None, 'mother': None, 'siblings': []})
+        self.head = head_name
+        self.dead = set()
+    def birth(self, p_name, c_name):
+        if p_name not in self.family:
+            self.family[p_name] = []
+        self.family[p_name].append(c_name)
+        if len(self.family[p_name]) == 1:  # First child
+            self.relationships[c_name]['mother'] = p_name
+        else:
+            for sibling in self.family[p_name]:
+                if sibling != c_name:
+                    self.relationships[c_name]['siblings'].append(sibling)
+                    self.relationships[sibling]['siblings'].append(c_name)
+        self.relationships[c_name]['father'] = p_name
+    def death(self, name):
+        self.dead.add(name)
+    def inheritance(self):
+        self.ans = []
+        self.depth_search(self.head)
+        return self.ans
+    def depth_search(self, current):
+        if current not in self.dead:
+            self.ans.append(current)
+        for child in self.family[current]:
+            self.depth_search(child)
+    def show_relationships(self):
+        for person, rels in self.relationships.items():
+            father = rels['father'] if rels['father'] else "Unknown"
+            mother = rels['mother'] if rels['mother'] else "Unknown"
+            siblings = ", ".join(rels['siblings']) if rels['siblings'] else "None"
+            print(f"{person}: Father: {father}, Mother: {mother}, Siblings: {siblings}")
+def main():
+    head_name = input("Enter the name of the head of the family: ").strip()
+    family_tree = Solution(head_name)
+    while True:
+        print("\nCommands:")
+        print("1. Add Birth (format: birth parent_name child_name)")
+        print("2. Add Death (format: death name)")
+        print("3. Get Inheritance")
+        print("4. Show Relationships")
+        print("5. Exit")
+        command = input("Enter command: ").strip().lower()
+        if command.startswith("birth"):
+            _, parent_name, child_name = command.split(maxsplit=2)
+            family_tree.birth(parent_name, child_name)
+            print(f"Added birth: {child_name} to {parent_name}")
+        elif command.startswith("death"):
+            _, name = command.split(maxsplit=1)
+            family_tree.death(name)
+            print(f"Added death: {name}")
+        elif command == "get inheritance":
+            print("Current inheritance order:", family_tree.inheritance())
+        elif command == "show relationships":
+            print("Current family relationships:")
+            family_tree.show_relationships()
+        elif command == "exit":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid command. Please try again.")
+if __name__ == "__main__":
+    main()
+
